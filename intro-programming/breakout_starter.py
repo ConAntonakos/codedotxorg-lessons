@@ -172,6 +172,48 @@ Example use of heading and setheading:
 	turtle_angle = name_of_turtle.heading()
 
 	name_of_turtle.setheading(new_angle)
+
+👉 This function checks if the ball hits a wall or corner, then flips its heading (direction) so it bounces back realistically.
+
+The ball can:
+Hit side walls (left or right)
+Hit the top wall
+Hit a corner (side wall + top wall at the same time)
+
+Because Turtle uses a heading angle:
+The ball always moves forward in its current heading.
+To bounce, you just change the heading to reflect the hit.
+
+if ball.xcor() > boundary or ball.xcor() < -boundary:
+✅ If the ball’s x position is greater than the right boundary or less than the left boundary → it’s outside the playable area horizontally.
+
+if ball.ycor() > boundary:
+	ball.left(180)
+✅ If the ball is also above the top boundary → you’re in a corner!
+
+You could flip twice (once for side wall, once for top wall), but it’s easier to:
+
+Just turn around 180° → same effect.
+
+➡️ So ball.left(180) reverses the heading.
+
+Example:
+
+Heading 45° → left(180) → now 225°
+The ball goes back the way it came.
+
+else:
+	ball.setheading(180 - ball.heading())
+✅ The ball only hit the side wall → you flip the heading horizontally:
+
+The new heading is the supplement → same trick:
+new_heading = 180 - old_heading
+This mirrors the path horizontally.
+
+✔️ Side walls flip left/right → 180 - heading
+✔️ Top wall flips up/down → 360 - heading
+✔️ Corner = both → just turn 180°
+
 '''
 
 #Checks for wall collision and changes direction
@@ -199,6 +241,35 @@ If all the above conditions are True, then change the angle of the ball
 to 360 minus the current angle.
 
 Hint: Think about how to use paddle_width to calculate the edges of the paddle
+
+======
+Checks if ball is near paddle top
+
+if ball.ycor() - ball_size < paddle.ycor() + (paddle_thickness / 2.0)
+What this means: 
+ball.ycor() → center of the ball.
+ball_size → radius of the ball.
+So ball.ycor() - ball_size → bottom edge of the ball.
+paddle.ycor() → center of paddle.
+paddle_thickness / 2.0 → distance from center to paddle top edge.
+“Is the bottom of the ball below the top edge of the paddle?"
+
+if ball.xcor() + ball_size > paddle.xcor() - (paddle_width / 2.0):
+What this means: 
+ball.xcor() + ball_size → right edge of the ball.
+paddle.xcor() - paddle_width/2 → left edge of the paddle.
+➡️ “Is the ball’s right edge to the right of the paddle’s left edge?”
+
+if ball.xcor() - ball_size < paddle.xcor() + (paddle_width / 2.0):
+What this means:
+ball.xcor() - ball_size → left edge of the ball.
+paddle.xcor() + paddle_width/2 → right edge of the paddle.
+➡️ “Is the ball’s left edge to the left of the paddle’s right edge?”
+
+“To bounce off the paddle, the ball must be:
+✔️ below paddle top edge,
+✔️ heading down,
+✔️ between left & right edges.”
 '''
 
 #Checks for paddle collision and changes direction
@@ -228,6 +299,30 @@ Hint: To check if the ball is touching each brick, think about how you did
 this for the paddle. Remember that in the case of bricks, you'll have to check
 whether the ball is within all 4 edges of the brick and it doesn't matter 
 in what direction the ball is moving.
+
+Explainer:
+“bounce_brick_row loops through every brick in the row.
+It checks if the ball is inside the brick’s box (top/bottom & left/right).
+If the brick is still visible, it hides the brick and flips the ball’s direction.”
+
+row is a list of Turtle brick objects (returned by make_brick_row).
+
+✅ What this does:
+ball.ycor() + ball_size → top edge of ball
+brick.ycor() - (brick_thickness / 2.0) → bottom edge of brick
+So: “Is ball’s top edge above brick’s bottom edge?”
+ball.ycor() - ball_size → bottom edge of ball
+brick.ycor() + (brick_thickness / 2.0) → top edge of brick
+So: “Is ball’s bottom edge below brick’s top edge?”
+
+✅ What this does:
+
+ball.xcor() + ball_size → right edge of ball
+brick.xcor() - (brick_width / 2.0) → left edge of brick
+So: “Is ball’s right edge past brick’s left edge?”
+ball.xcor() - ball_size → left edge of ball
+brick.xcor() + (brick_width / 2.0) → right edge of brick
+So: “Is ball’s left edge before brick’s right edge?”
 '''
 def bounce_brick_row(row):
 	pass
