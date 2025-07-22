@@ -240,10 +240,17 @@ Hint: Think about how to use paddle_width to calculate the edges of the paddle
 
 #Checks for paddle collision and changes direction
 def bounce_paddle():
-	if ball.ycor() - ball_size < paddle.ycor() + (paddle_thickness / 2.0) and 180 < ball.heading():
-		if ball.xcor() + ball_size > paddle.xcor() - (paddle_width / 2.0):
-			if ball.xcor() - ball_size < paddle.xcor() + (paddle_width / 2.0):
-				ball.setheading(360 - ball.heading())
+    if (
+        # Ball bottom below paddle top
+        ball.ycor() - ball_size < paddle.ycor() + (paddle_thickness / 2.0)
+        # Ball heading down
+        and 180 < ball.heading()
+        # Ball right edge past paddle left edge
+        and ball.xcor() + ball_size > paddle.xcor() - (paddle_width / 2.0)
+        # Ball left edge before paddle right edge
+        and ball.xcor() - ball_size < paddle.xcor() + (paddle_width / 2.0)
+    ):
+        ball.setheading(360 - ball.heading())
 
 '''
 TODO: Bounce brick row
@@ -269,15 +276,19 @@ whether the ball is within all 4 edges of the brick and it doesn't matter
 in what direction the ball is moving.
 '''
 def bounce_brick_row(row):
-		for brick in row:
-			if ball.ycor() + ball_size > brick.ycor() - (brick_thickness / 2.0):
-				if ball.ycor() - ball_size < brick.ycor() + (brick_thickness / 2.0):
-					if ball.xcor() + ball_size > brick.xcor() - (brick_width / 2.0):
-						if ball.xcor() - ball_size < brick.xcor() + (brick_width / 2.0):
-							if brick.isvisible():
-								brick.ht()
-								ball.setheading(360 - ball.heading())
-							break
+    for brick in row:
+        if (
+            brick.isvisible()  # Skip hidden bricks
+            # Ball overlaps brick vertically
+            and ball.ycor() + ball_size > brick.ycor() - (brick_thickness / 2.0)
+            and ball.ycor() - ball_size < brick.ycor() + (brick_thickness / 2.0)
+            # Ball overlaps brick horizontally
+            and ball.xcor() + ball_size > brick.xcor() - (brick_width / 2.0)
+            and ball.xcor() - ball_size < brick.xcor() + (brick_width / 2.0)
+        ):
+            brick.ht()  # Hide brick
+            ball.setheading(360 - ball.heading())  # Bounce ball
+            break  # Only break one brick per loop
 
 def bounce_bricks():
 	bounce_brick_row(row1)
